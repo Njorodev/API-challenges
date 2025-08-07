@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>API Tester</title>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    input, button, label {
+      margin: 5px;
+      padding: 8px;
+      font-size: 14px;
+    }
+    .response {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      background: #fff;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🧪 Simple API Tester</h2>
+
+  <div class="section">
+    <h3>➕ Create Task (POST)</h3>
+    <input id="taskInput" type="text" placeholder="Enter a new task">
+    <button onclick="sendPost()">POST Task</button>
+  </div>
+
+  <div class="section">
+    <h3>✏️ Update Task (PUT)</h3>
+    <input id="sessionInput" type="text" placeholder="Session timestamp (e.g. 2025-08-07 10:49:24)">
+    <input id="idInput" type="number" placeholder="Task ID">
+    <input id="updateTaskInput" type="text" placeholder="Updated task name">
+    <label>
+      <input id="completedInput" type="checkbox"> Completed
+    </label>
+    <button onclick="sendPut()">PUT Update</button>
+  </div>
+
+  <div class="section">
+    <h3>📋 View All Tasks (GET)</h3>
+    <button onclick="getTasks()">GET Tasks</button>
+  </div>
+
+  <div class="response" id="output">Response will appear here...</div>
+
+  <script>
+    const apiUrl = 'http://127.0.0.1:5000/todos';
+
+    function sendPost() {
+      const task = document.getElementById('taskInput').value;
+      if (!task) {
+        updateOutput({ error: "Task cannot be empty." });
+        return;
+      }
+
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task })
+      })
+      .then(res => res.json())
+      .then(data => updateOutput(data))
+      .catch(err => updateOutput(err));
+    }
+
+    function sendPut() {
+      const sessionTime = document.getElementById('sessionInput').value;
+      const todoId = document.getElementById('idInput').value;
+      const task = document.getElementById('updateTaskInput').value;
+      const completed = document.getElementById('completedInput').checked;
+
+      if (!sessionTime || !todoId || !task) {
+        updateOutput({ error: "Please fill in all fields." });
+        return;
+      }
+
+      fetch(`${apiUrl}/${encodeURIComponent(sessionTime)}/${todoId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task, completed })
+      })
+      .then(res => res.json())
+      .then(data => updateOutput(data))
+      .catch(err => updateOutput(err));
+    }
+
+    function getTasks() {
+      fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => updateOutput(data))
+      .catch(err => updateOutput(err));
+    }
+
+    function updateOutput(content) {
+      document.getElementById('output').textContent = JSON.stringify(content, null, 2);
+    }
+  </script>
+
+</body>
+</html>
+

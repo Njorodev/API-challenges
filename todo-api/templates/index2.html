@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>API Tester</title>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
+    input, button { margin: 5px; padding: 8px; }
+    .response { margin-top: 20px; white-space: pre-wrap; background: #fff; padding: 10px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+
+  <h2>Simple API Tester</h2>
+
+  <input id="taskInput" type="text" placeholder="Enter a task">
+  <button onclick="sendPost()">POST Task</button>
+  <button onclick="sendPut()">PUT Update</button>
+  <button onclick="getTasks()">GET Tasks</button>
+
+  <div class="response" id="output">Response will appear here...</div>
+
+  <script>
+    const apiUrl = 'http://127.0.0.1:5000/todos';
+    const cors = require('cors');
+       Sapp.use(cors());
+
+    function sendPost() {
+      const task = document.getElementById('taskInput').value;
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task })
+      })
+      .then(res => res.json())
+      .then(data => updateOutput(data))
+      .catch(err => updateOutput(err));
+    }
+
+    function sendPut() {
+      const task = document.getElementById('taskInput').value;
+      fetch(apiUrl + '/1', { // adjust ID if needed
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task })
+      })
+      .then(res => res.json())
+      .then(data => updateOutput(data))
+      .catch(err => updateOutput(err));
+    }
+
+    function getTasks() {
+      fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => updateOutput(data))
+      .catch(err => updateOutput(err));
+    }
+
+    function updateOutput(content) {
+      document.getElementById('output').textContent = JSON.stringify(content, null, 2);
+    }
+  </script>
+
+</body>
+</html>
+
